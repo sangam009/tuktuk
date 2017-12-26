@@ -10,11 +10,11 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 
 import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
 import org.elasticsearch.search.SearchHit;
+import org.elasticsearch.transport.client.PreBuiltTransportClient;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
@@ -117,11 +117,8 @@ public class SupportServiceImpl implements SupportService {
 		 */
 
 		try {
-			TransportClient client = new PreBuil(Settings.EMPTY)
-					.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("host1"), 9300))
-					.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("host2"), 9300));
-//			Client client = TransportClient.builder().build()
-//					.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
+			TransportClient client = new PreBuiltTransportClient(Settings.EMPTY)
+					.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
 			SearchResponse searchResponse = client.prepareSearch("promo_apply_logs").setTypes("promo_apply_logs")
 					.execute().actionGet();
 			SearchHit[] hits = searchResponse.getHits().getHits();
@@ -147,4 +144,9 @@ public class SupportServiceImpl implements SupportService {
 	 * 
 	 * return client; }
 	 */
+
+	@Override
+	public void populateDataInES(List<JsonObject> objects) {
+
+	}
 }
