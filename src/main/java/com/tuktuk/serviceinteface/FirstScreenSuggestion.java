@@ -3,10 +3,10 @@ package com.tuktuk.serviceinteface;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.google.gson.JsonObject;
+import com.google.gson.Gson;
 
 public interface FirstScreenSuggestion {
 
-	public JsonObject getSuggestion(HttpServletRequest req, HttpServletResponse res);
+	public Gson getSuggestion(HttpServletRequest req, HttpServletResponse res) throws Exception;
 
 }

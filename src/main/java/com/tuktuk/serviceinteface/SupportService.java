@@ -1,5 +1,7 @@
 package com.tuktuk.serviceinteface;
 
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 
 import com.google.gson.JsonObject;
@@ -13,4 +15,9 @@ public interface SupportService {
 	public Location getLocation(SuggestionRequest suggestion);
 
 	public Object getRequestedObject(JsonObject request);
+
+	public List<JsonObject> getGeoCodeApiResult(SuggestionRequest suggest) throws Exception;
+
+	public List<JsonObject> getGeoCodeFromElasticsearch();
+
 }
