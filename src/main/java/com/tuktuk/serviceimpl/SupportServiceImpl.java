@@ -1,20 +1,19 @@
 package com.tuktuk.serviceimpl;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.elasticsearch.action.search.SearchResponse;
-import org.elasticsearch.client.transport.TransportClient;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.transport.InetSocketTransportAddress;
-import org.elasticsearch.search.SearchHit;
-import org.elasticsearch.transport.client.PreBuiltTransportClient;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
+import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
+import org.elasticsearch.client.Response;
+import org.elasticsearch.client.RestClient;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
@@ -31,6 +30,14 @@ import com.tuktuk.serviceinteface.SupportService;
 
 @Service
 public class SupportServiceImpl implements SupportService {
+
+	final static Logger log = Logger.getLogger(SuggestionRequest.class);
+
+	@Value("${elasticsearch.url}")
+	String elasticsearchUrl;
+
+	@Value("${elasticsearch.port}")
+	String elasticsearchPort;
 
 	@Override
 	public JsonObject serializeReqToJson(HttpServletRequest req) {
@@ -103,50 +110,57 @@ public class SupportServiceImpl implements SupportService {
 	}
 
 	@Override
-	public List<JsonObject> getGeoCodeFromElasticsearch() {
+	public Double getHashCodeOfLocation(JsonObject geoCodeApiResponseRefined) {
 
-		/*
-		 * Client client = getElasticsearchClient("elasticsearch", "127.0.0.1", 9300);
-		 * System.out.println("client is " + client); QueryBuilder builder =
-		 * QueryBuilders.matchQuery("user", "kimchy"); SearchResponse res =
-		 * client.prepareSearch("promo_apply_logs").setTypes("promo_apply_logs")
-		 * .setSearchType(SearchType.QUERY_AND_FETCH).setQuery(builder).setFrom(0).
-		 * setSize(60).setExplain(true) .execute().actionGet(); SearchHit[] results =
-		 * res.getHits().getHits(); for (SearchHit searchHit : results) { Map<String,
-		 * Object> result = searchHit.getSource(); System.out.println(result); }
-		 */
+		JsonObject location = geoCodeApiResponseRefined.get("geometry").getAsJsonObject().get("location")
+				.getAsJsonObject();
+		Double addedValueOfLatLong = Double.parseDouble(location.get("lat").toString())
+				+ Double.parseDouble(location.get("lng").toString());
+		log.info("location value is" + location.toString());
+		log.info("addedlong value is " + addedValueOfLatLong.toString());
+		// Long.valueOf(Double.doubleToLongBits(addedValueOfLatLong)).hashCode();
 
-		try {
-			TransportClient client = new PreBuiltTransportClient(Settings.EMPTY)
-					.addTransportAddress(new InetSocketTransportAddress(InetAddress.getByName("localhost"), 9300));
-			SearchResponse searchResponse = client.prepareSearch("promo_apply_logs").setTypes("promo_apply_logs")
-					.execute().actionGet();
-			SearchHit[] hits = searchResponse.getHits().getHits();
-			Map<String, Object> attributes = new HashMap<>();
-			attributes.put("songs", hits);
-			System.out.println("attributes are " + attributes);
-		} catch (UnknownHostException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		return addedValueOfLatLong;
+	}
+
+	@Override
+	public List<JsonObject> getElasticsearchResponse(Double hashCodeList) {
+
 		return null;
+	}
+
+	@Override
+	public void enrichGeoCodeApiResponse(List<JsonObject> geoCodeApiResponse) {
+		// TODO Auto-generated method stub
 
 	}
 
-	/*
-	 * @SuppressWarnings("resource") public static Client
-	 * getElasticsearchClient(String clustername, String ipAddress, int port) {
-	 * 
-	 * Settings settings = Settings.builder().put("cluster.name",
-	 * clustername).build(); Client client = null; try { client = new
-	 * TransportClient } catch (Exception e) { System.out.println("error is " +
-	 * e.toString()); e.printStackTrace(); }
-	 * 
-	 * return client; }
-	 */
+	@Override
+	public void indexEnrichedgeoCodeResponse(List<JsonObject> geoCodeApiResponse) {
+		// TODO Auto-generated method stub
+
+	}
 
 	@Override
-	public void populateDataInES(List<JsonObject> objects) {
+	public JsonObject refineGeoCodeApiResponse(List<JsonObject> geoCodeApiResponse) {
 
+		List<JsonObject> refinedResult = new ArrayList<JsonObject>();
+
+		if (geoCodeApiResponse.size() != 0) {
+			JsonObject mostSignificantLocation = geoCodeApiResponse.get(0);
+			return mostSignificantLocation;
+		}
+		log.info("geocode api response is empty");
+
+		return null;
+	}
+
+	public List<JsonObject> queryElasticsearch(HttpEntity queryEntity, String endpoint, String handler)
+			throws IOException {
+		RestClient restClient = RestClient
+				.builder(new HttpHost(elasticsearchUrl, Integer.parseInt(elasticsearchPort), "http")).build();
+		Response response = restClient.performRequest(handler, endpoint, Collections.singletonMap("pretty", "true"));
+		System.out.println(EntityUtils.toString(response.getEntity()));
+		return null;
 	}
 }

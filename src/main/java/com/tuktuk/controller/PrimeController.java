@@ -29,8 +29,8 @@ public class PrimeController {
 	@RequestMapping(value = "/getSuggestion", method = RequestMethod.POST)
 	@ResponseBody
 	public String getData(HttpServletRequest req, HttpServletResponse res) throws Exception {
-		/*return suggest.getSuggestion(req, res).toString();*/
-		return suggest.getSuggestion(new SuggestionRequest()).toString();
-	}	
+		return suggest.getSuggestion(req, res).toString();
+		// return suggest.getSuggestion(new SuggestionRequest()).toString();
+	}
 
 }

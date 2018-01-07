@@ -1,5 +1,6 @@
 package com.tuktuk.serviceinteface;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,7 +19,13 @@ public interface SupportService {
 
 	List<JsonObject> getGeoCodeApiResult(SuggestionRequest suggest) throws Exception;
 
-	List<JsonObject> getGeoCodeFromElasticsearch();
+	Double getHashCodeOfLocation(JsonObject geoCodeApiResponseRefined);
 
-	void populateDataInES(List<JsonObject> objects);
+	List<JsonObject> getElasticsearchResponse(Double hashCodeList);
+
+	void enrichGeoCodeApiResponse(List<JsonObject> geoCodeApiResponse);
+
+	void indexEnrichedgeoCodeResponse(List<JsonObject> geoCodeApiResponse);
+
+	JsonObject refineGeoCodeApiResponse(List<JsonObject> geoCodeApiResponse);
 }
