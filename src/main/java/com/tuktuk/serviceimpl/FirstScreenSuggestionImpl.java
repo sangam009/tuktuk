@@ -29,17 +29,23 @@ public class FirstScreenSuggestionImpl implements FirstScreenSuggestion {
 
 		List<JsonObject> geoCodeApiResponse = support.getGeoCodeApiResult(suggestionRequest);
 
+		System.out.println("geocode api response is " + geoCodeApiResponse.toString());
+
 		JsonObject geoCodeApiResponseRefined = support.refineGeoCodeApiResponse(geoCodeApiResponse);
+
+		System.out.println("geocode api refined response is " + geoCodeApiResponseRefined.toString());
 
 		Double hashCode = support.getHashCodeOfLocation(geoCodeApiResponseRefined);
 
-		List<JsonObject> elasticsearchResponse = support.getElasticsearchResponse(hashCode);
+		System.out.println("hash code value is " + hashCode.toString());
 
-		if (elasticsearchResponse.size() != 0) {
+		List<JsonObject> elasticsearchResponse = support.getElasticsearchResponse(hashCode);
+		System.out.println("elasticssarch response size is " + elasticsearchResponse.size());
+		if (elasticsearchResponse.size() > 1) {
 			return elasticsearchResponse;
 		}
 
-		support.enrichGeoCodeApiResponse(geoCodeApiResponse);
+		geoCodeApiResponse = support.enrichGeoCodeApiResponse(geoCodeApiResponse);
 		support.indexEnrichedgeoCodeResponse(geoCodeApiResponse);
 
 		return geoCodeApiResponse;

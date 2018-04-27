@@ -9,14 +9,28 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @SpringBootApplication
 @EnableAutoConfiguration
 @ComponentScan("com.tuktuk")
+@EnableAsync
 public class TukTukApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(TukTukApplication.class, args);
+	}
+
+	@Bean(name = "executor")
+	public TaskExecutor taskExecutor() {
+		ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+		executor.setCorePoolSize(5);
+		executor.setMaxPoolSize(10);
+		executor.setQueueCapacity(25);
+		executor.initialize();
+		return executor;
 	}
 
 	@Bean
@@ -28,7 +42,7 @@ public class TukTukApplication {
 			String[] beanNames = ctx.getBeanDefinitionNames();
 			Arrays.sort(beanNames);
 			for (String beanName : beanNames) {
-				System.out.println("bean name is "+ beanName);
+				System.out.println("bean name is " + beanName);
 			}
 
 		};

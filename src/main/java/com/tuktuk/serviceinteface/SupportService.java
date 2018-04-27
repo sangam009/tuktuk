@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.json.JSONException;
+
 import com.google.gson.JsonObject;
 import com.tuktuk.model.Location;
 import com.tuktuk.model.SuggestionRequest;
@@ -21,9 +23,9 @@ public interface SupportService {
 
 	Double getHashCodeOfLocation(JsonObject geoCodeApiResponseRefined);
 
-	List<JsonObject> getElasticsearchResponse(Double hashCodeList);
+	List<JsonObject> getElasticsearchResponse(Double hashCodeList) throws IOException;
 
-	void enrichGeoCodeApiResponse(List<JsonObject> geoCodeApiResponse);
+	List<JsonObject> enrichGeoCodeApiResponse(List<JsonObject> geoCodeApiResponse) throws IOException, JSONException;
 
 	void indexEnrichedgeoCodeResponse(List<JsonObject> geoCodeApiResponse);
 

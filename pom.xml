@@ -25,6 +25,13 @@
 	</properties>
 
 	<dependencies>
+
+		<dependency>
+			<groupId>se.walkercrou</groupId>
+			<artifactId>google-places-api-java</artifactId>
+			<version>2.1.7</version>
+		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-thymeleaf</artifactId>
@@ -63,6 +70,11 @@
 			<groupId>com.google.maps</groupId>
 			<artifactId>google-maps-services</artifactId>
 			<version>0.1.1</version>
+		</dependency>
+		<dependency>
+			<groupId>org.json</groupId>
+			<artifactId>json</artifactId>
+			<version>20080701</version>
 		</dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
