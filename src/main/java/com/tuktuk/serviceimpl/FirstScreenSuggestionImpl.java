@@ -45,10 +45,10 @@ public class FirstScreenSuggestionImpl implements FirstScreenSuggestion {
 			return elasticsearchResponse;
 		}
 
-		geoCodeApiResponse = support.enrichGeoCodeApiResponse(geoCodeApiResponse);
-		support.indexEnrichedgeoCodeResponse(geoCodeApiResponse);
+		List<JsonObject> geoCodeApiResponseEnrichmentResult = support
+				.enrichGeoCodeApiResponse(geoCodeApiResponseRefined);
 
-		return geoCodeApiResponse;
+		return geoCodeApiResponseEnrichmentResult;
 	}
 
 }

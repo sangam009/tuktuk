@@ -169,10 +169,18 @@ public class SupportServiceImpl implements SupportService {
 	}
 
 	@Override
-	public List<JsonObject> enrichGeoCodeApiResponse(List<JsonObject> geoCodeApiResponse)
-			throws IOException, JSONException {
-		List<JsonObject> defaultResult = getDefaultSearchResult();
-		asyncservice.addNearBySearchToTheEnrichment(geoCodeApiResponse);
+	public List<JsonObject> enrichGeoCodeApiResponse(JsonObject geoCodeApiResponse) {
+		List<JsonObject> defaultResult = null;
+		try {
+			defaultResult = getDefaultSearchResult();
+			asyncservice.addNearbySearchPayloadToKafka(geoCodeApiResponse);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return defaultResult;
 	}
 
@@ -181,7 +189,8 @@ public class SupportServiceImpl implements SupportService {
 		options.addProperty("type", "matchall");
 		String query = buildQuery(options.get("type").toString(), options);
 		HttpEntity entity = new NStringEntity(query, ContentType.APPLICATION_JSON);
-		List<JsonObject> elasticsearchresponse = queryElasticsearch(entity, config.getElasticsearchBestResultHandler(), "GET");
+		List<JsonObject> elasticsearchresponse = queryElasticsearch(entity, config.getElasticsearchBestResultHandler(),
+				"GET");
 		return elasticsearchresponse;
 	}
 

@@ -25,7 +25,7 @@ public interface SupportService {
 
 	List<JsonObject> getElasticsearchResponse(Double hashCodeList) throws IOException;
 
-	List<JsonObject> enrichGeoCodeApiResponse(List<JsonObject> geoCodeApiResponse) throws IOException, JSONException;
+	List<JsonObject> enrichGeoCodeApiResponse(JsonObject geoCodeApiResponse) throws IOException, JSONException;
 
 	void indexEnrichedgeoCodeResponse(List<JsonObject> geoCodeApiResponse);
 
