@@ -20,7 +20,7 @@ public class PrimeController {
 	@RequestMapping(value = "/test", method = RequestMethod.GET)
 	@ResponseBody
 	public String getTestValue(HttpServletRequest req, HttpServletResponse res) {
-		return req.getRequestURI();
+ 		return req.getRequestURI();
 
 	}
 

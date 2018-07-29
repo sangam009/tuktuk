@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.google.maps.GeoApiContext;
@@ -64,6 +65,7 @@ public class SupportServiceImpl implements SupportService {
 
 			response.addProperty("latitude", req.getParameter("latitude"));
 			response.addProperty("longitude", req.getParameter("longitude"));
+			response.addProperty("radiusInMeters", req.getParameter("radiusInMeters"));
 			response.addProperty("tag", "getSuggestion");
 
 			break;
@@ -92,6 +94,7 @@ public class SupportServiceImpl implements SupportService {
 			SuggestionRequest suggest = new SuggestionRequest();
 			suggest.setLatitude(request.get("latitude").getAsDouble());
 			suggest.setLongitude(request.get("longitude").getAsDouble());
+			suggest.radiusInMeters = request.get("radiusInMeters").getAsInt();
 			return suggest;
 
 		default:
@@ -158,7 +161,7 @@ public class SupportServiceImpl implements SupportService {
 			query_inner.addProperty(options.get("key").toString(), options.get("value").toString());
 			query_inner1.add("match", query_inner);
 			query_final.add("query", query_inner1);
-			System.out.println("final query to be send is " + query_final.toString());
+			log.info("final query to be send is " + query_final.toString());
 			break;
 
 		default:
@@ -169,19 +172,65 @@ public class SupportServiceImpl implements SupportService {
 	}
 
 	@Override
-	public List<JsonObject> enrichGeoCodeApiResponse(List<JsonObject> geoCodeApiResponse)
+	public List<JsonObject> enrichGeoCodeApiResponse(List<JsonObject> geoCodeApiResponse, SuggestionRequest request)
 			throws IOException, JSONException {
-		List<JsonObject> defaultResult = getDefaultSearchResult();
+		JsonObject finalRequest = getParamsBasedSuggestionRequst(request);
+		List<JsonObject> defaultResult = getDefaultSearchResult(finalRequest);
 		asyncservice.addNearBySearchToTheEnrichment(geoCodeApiResponse);
 		return defaultResult;
 	}
 
-	private List<JsonObject> getDefaultSearchResult() throws IOException {
+	private JsonObject getParamsBasedSuggestionRequst(SuggestionRequest request) {
 		JsonObject options = new JsonObject();
-		options.addProperty("type", "matchall");
-		String query = buildQuery(options.get("type").toString(), options);
-		HttpEntity entity = new NStringEntity(query, ContentType.APPLICATION_JSON);
+		
+		JsonObject query = new JsonObject();
+		JsonObject bool = new JsonObject();
+		JsonArray must = new JsonArray();
+		
+		JsonObject geoLoc = new JsonObject();
+		
+		JsonObject geoLocInner = new JsonObject();
+		geoLocInner.addProperty("distance", String.valueOf(request.radiusInMeters) + "m");
+		
+		JsonObject loc = new JsonObject();
+		loc.addProperty("lat", request.getLatitude());
+		loc.addProperty("lon", request.getLongitude());
+		
+		geoLocInner.add("geometry.location", loc);
+		
+		geoLoc.add("geo_distance", geoLocInner);
+		
+		must.add(geoLoc);
+		
+		JsonObject match = new JsonObject();
+		JsonObject type = new JsonObject();
+		type.addProperty("types", "BANK, restaurant");
+		match.add("match", type);
+		must.add(match);
+		
+		bool.add("must", must);
+		query.add("bool", bool);
+		options.add("query",query);
+		
+		JsonArray sorting = new JsonArray();
+		JsonObject sort = new JsonObject();
+		JsonObject item = new JsonObject();
+		item.addProperty("order", "desc");
+		sort.add("rating", item);
+		sorting.add(sort);
+		options.add("sort", sorting );
+		
+//		options.addProperty("type", "matchall");
+//		String query = buildQuery(options.get("type").toString(), options);
+		System.out.println("final query to search is " + options.toString());
+		return options;
+	}
+
+	private List<JsonObject> getDefaultSearchResult(JsonObject request) throws IOException {
+		
+		HttpEntity entity = new NStringEntity(request.toString(), ContentType.APPLICATION_JSON);
 		List<JsonObject> elasticsearchresponse = queryElasticsearch(entity, config.getElasticsearchBestResultHandler(), "GET");
+		System.out.println("final query to search is " + elasticsearchresponse.get(0).toString());
 		return elasticsearchresponse;
 	}
 
@@ -215,5 +264,16 @@ public class SupportServiceImpl implements SupportService {
 		List<JsonObject> result = new ArrayList<JsonObject>();
 		result.add(array);
 		return result;
+	}
+
+	@Override
+	public List<JsonObject> nearBySuggestionSearch(SuggestionRequest suggestionRequest) throws IOException  {
+		// TODO Auto-generated method stub
+		JsonObject finalRequest = getParamsBasedSuggestionRequst(suggestionRequest);
+		
+		HttpEntity entity = new NStringEntity(finalRequest.toString(), ContentType.APPLICATION_JSON);
+		List<JsonObject> elasticsearchresponse = queryElasticsearch(entity, config.getElasticsearchBestResultHandler(), "GET");
+		System.out.println("final query to search is " + elasticsearchresponse.get(0).toString());
+		return elasticsearchresponse;
 	}
 }
