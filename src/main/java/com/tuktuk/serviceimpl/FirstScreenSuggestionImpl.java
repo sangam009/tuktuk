@@ -55,7 +55,6 @@ public class FirstScreenSuggestionImpl implements FirstScreenSuggestion {
 				support.indexEnrichedgeoCodeResponse(geoCodeApiResponse);	
 			}	
 		}
-
 		return geoCodeApiResponse;
 	}
 

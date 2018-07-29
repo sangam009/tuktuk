@@ -174,10 +174,20 @@ public class SupportServiceImpl implements SupportService {
 	@Override
 	public List<JsonObject> enrichGeoCodeApiResponse(List<JsonObject> geoCodeApiResponse, SuggestionRequest request)
 			throws IOException, JSONException {
-		JsonObject finalRequest = getParamsBasedSuggestionRequst(request);
-		List<JsonObject> defaultResult = getDefaultSearchResult(finalRequest);
-		asyncservice.addNearBySearchToTheEnrichment(geoCodeApiResponse);
+		List<JsonObject> defaultResult  = new ArrayList<JsonObject>();
+		try {
+			JsonObject finalRequest = getParamsBasedSuggestionRequst(request);
+			defaultResult = getDefaultSearchResult(finalRequest);
+			asyncservice.addNearBySearchToTheEnrichment(geoCodeApiResponse);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		return defaultResult;
+		
 	}
 
 	private JsonObject getParamsBasedSuggestionRequst(SuggestionRequest request) {
