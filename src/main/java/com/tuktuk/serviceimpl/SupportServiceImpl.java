@@ -178,7 +178,7 @@ public class SupportServiceImpl implements SupportService {
 		try {
 			JsonObject finalRequest = getParamsBasedSuggestionRequst(request);
 			defaultResult = getDefaultSearchResult(finalRequest);
-			asyncservice.addNearBySearchToTheEnrichment(geoCodeApiResponse);
+			asyncservice.addNearbySearchPayloadToKafka(geoCodeApiResponse);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

@@ -74,11 +74,10 @@ public class AsyncServices {
 
 	/* method to publish data in kafka topic for async syncing of data */
 	@Async("executor")
-	public void addNearbySearchPayloadToKafka(JsonObject geoCodeApiResponse) throws Exception {
+	public void addNearbySearchPayloadToKafka(List<JsonObject> geoCodeApiResponse) throws Exception {
 		System.out.println("enetered the async method");
-		List<JsonObject> payload = new ArrayList<JsonObject>();
-		payload.add(0, geoCodeApiResponse);
-		runProducer(payload.size(), payload);
+		
+		runProducer(geoCodeApiResponse.size(), geoCodeApiResponse);
 	}
 
 	@Async("executor")

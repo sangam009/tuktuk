@@ -43,7 +43,7 @@ public class FirstScreenSuggestionImpl implements FirstScreenSuggestion {
 		System.out.println("hash code value is " + hashCode.toString());
 
 		List<JsonObject> elasticsearchResponse = support.getElasticsearchResponse(hashCode);
-		log.info("elasticssarch response size is " + elasticsearchResponse.size());
+		log.info("elasticsearch response size is " + elasticsearchResponse.size());
 		if (elasticsearchResponse.size() >= 1 && elasticsearchResponse.get(0).getAsJsonObject("hits").get("total").getAsInt() > 0 ) {
 			return elasticsearchResponse;
 		}else {
